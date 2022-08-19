@@ -18,6 +18,8 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import React from "react";
 import { mainListItems, secondaryListItems } from "../Dashboard/listItems";
+import Button from "@mui/material/Button";
+import { SimpleDialog } from "./createQuiz";
 
 function Copyright(props: any) {
   return (
@@ -38,7 +40,7 @@ function Copyright(props: any) {
 }
 
 const drawerWidth: number = 240;
-
+const emails = ["username@gmail.com", "user02@gmail.com"];
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
 }
@@ -91,6 +93,17 @@ export default function Dashboard({ children }: { children: any }) {
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+  const [openCreateQuizzez, setOpenCreateQuizzez] = React.useState(false);
+  const [selectedValue, setSelectedValue] = React.useState(emails[1]);
+
+  const handleClickOpen = () => {
+    setOpenCreateQuizzez(true);
+  };
+
+  const handleClose = (value: string) => {
+    setOpenCreateQuizzez(false);
+    setSelectedValue(value);
   };
   return (
     <>
@@ -146,6 +159,34 @@ export default function Dashboard({ children }: { children: any }) {
             </Toolbar>
             <Divider />
             <List component="nav">
+              <Button
+                size="large"
+                onClick={handleClickOpen}
+                sx={{
+                  bgcolor: "#461a42",
+                  marginX: "10px",
+                  borderRadius: 2,
+                  textAlign: "center",
+                  color: "#ffffff",
+                  textTransform: "unset",
+                  fontSize: "0.9rem",
+                  fontWeight: "700",
+
+                  lineHeight: "30px",
+                  paddingX: "40px",
+                  "&.MuiButtonBase-root:hover": {
+                    bgcolor: "#461a42",
+                  },
+                }}
+              >
+                Create Quizzes
+              </Button>
+
+              <SimpleDialog
+                selectedValue={selectedValue}
+                open={openCreateQuizzez}
+                onClose={handleClose}
+              />
               {mainListItems}
               <Divider sx={{ my: 1 }} />
               {secondaryListItems}
