@@ -1,146 +1,100 @@
 import * as React from "react";
 import Dashboard from "@components/Dashboard";
 import type { NextPage } from "next";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridCellParams } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Link, { LinkProps } from "next/link";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import AddIcon from "@mui/icons-material/Add";
+import IconButton from "@mui/material/IconButton";
+import { useRouter } from "next/router";
+import { DeleteQuizz } from "@components/Dashboard/deleteQuiz";
+import { rows } from "_mocks_/questions";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 70 },
-  { field: "name", headerName: "Title", width: 130 },
-  { field: "description", headerName: "Description", width: 130 },
+  { field: "id", headerName: "ID", width: 50 },
+  { field: "name", headerName: "Title" },
+  { field: "description", headerName: "Description" },
   {
     field: "totalQuestions",
     headerName: "Questions",
     type: "number",
-    width: 90,
   },
   {
     field: "category",
     headerName: "Category",
-    width: 90,
-    renderCell: (params: GridRenderCellParams<LinkProps>) => (
-      <Link href={`/dashboard/${params.name}`}>
-        <a>{params.name}</a>
+
+    renderCell: ({ value }) => (
+      <Link href={`/dashboard/${value.id}`}>
+        <a>{value.title}</a>
       </Link>
     ),
   },
+  {
+    field: "edit",
+    headerName: "Edit",
+    sortable: false,
+    renderCell: () => {
+      return (
+        <IconButton color="primary">
+          <EditIcon />
+        </IconButton>
+      );
+    },
+  },
+  {
+    field: "addQuestion",
+    headerName: "Add Question",
+    sortable: false,
+    renderCell: () => {
+      return (
+        <IconButton color="secondary">
+          <AddIcon />
+        </IconButton>
+      );
+    },
+  },
+  {
+    field: "delete",
+    headerName: "Delete",
+    sortable: false,
+    renderCell: () => {
+      return (
+        <IconButton color="error">
+          <DeleteIcon />
+        </IconButton>
+      );
+    },
+  },
 ];
 
-const rows = [
-  {
-    id: 1,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 2,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 3,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 4,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 5,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 6,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 7,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 8,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 9,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 0,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 11,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 12,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 13,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 14,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-  {
-    id: 15,
-    name: "Match",
-    description: "Jon",
-    category: { id: "1", name: "Category1" },
-    totalQuestions: 35,
-  },
-];
 const QuizzesList: NextPage = () => {
+  const router = useRouter();
+  const [openDeleteQuizz, setOpenDeleteQuizz] = React.useState(false);
+  const [idValue, setIdValue] = React.useState("");
+  const handleClose = (value: string) => {
+    setOpenDeleteQuizz(false);
+  };
+
+  function currentlySelected(params: GridCellParams) {
+    const value = params.colDef.field;
+
+    if (!(value === "edit" || value === "delete" || value === "addQuestion")) {
+      return;
+    }
+    if (value == "edit") {
+      router.push({
+        pathname: "/dashboard/quizzes/[pid]",
+        query: { pid: params.row.id },
+      });
+    }
+    if (value === "delete") {
+      setIdValue(params.row.id);
+      setOpenDeleteQuizz(true);
+    }
+  }
+  console.log(openDeleteQuizz);
   return (
     <Dashboard>
       <Box sx={{ height: "50vh" }}>
@@ -150,6 +104,12 @@ const QuizzesList: NextPage = () => {
           pageSize={5}
           rowsPerPageOptions={[5]}
           checkboxSelection
+          onCellClick={currentlySelected}
+        />
+        <DeleteQuizz
+          id={idValue}
+          open={openDeleteQuizz}
+          onClose={handleClose}
         />
       </Box>
     </Dashboard>

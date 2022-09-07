@@ -13,15 +13,17 @@ import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
 export interface SimpleDialogProps {
   open: boolean;
-  selectedValue: string;
+  idValue: string;
   onClose: (value: string) => void;
 }
-export function SimpleDialog(props: SimpleDialogProps) {
-  const { onClose, selectedValue, open } = props;
-  const [age, setAge] = useState("");
+export function EditQuizInfo(props: SimpleDialogProps) {
+  const { onClose, idValue, open } = props;
+  const [category, setCategory] = useState("10");
+  const [name, setName] = useState("Name quiz");
   const handleClose = () => {
-    onClose(selectedValue);
-    console.log(onClose);
+    onClose(idValue);
+    setCategory("10");
+    setName("Name quiz");
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -31,7 +33,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
   };
 
   const handleChange = (event: SelectChangeEvent) => {
-    setAge(event.target.value);
+    setCategory(event.target.value);
   };
   const [files, setFiles] = useState<File[]>([]);
   return (
@@ -44,7 +46,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
         />
         <Box>
           <DialogTitle>
-            Create a quiz
+            Edit quiz infomations
             <Typography fontSize={"12px"}>
               Ideal for student-paced sessions or self-paced assignments.
             </Typography>
@@ -73,6 +75,8 @@ export function SimpleDialog(props: SimpleDialogProps) {
               id="name"
               name="name"
               placeholder="Enter a quiz name"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
               autoFocus
             />
           </FormGroup>
@@ -83,7 +87,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
               labelId="demo-select-small"
               id="demo-select-small"
               name="demo-select-small"
-              value={age}
+              value={category}
               label="Age"
               onChange={handleChange}
             >
@@ -117,7 +121,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
               variant="contained"
               sx={{ mt: 3, mb: 2, width: "50%" }}
             >
-              Next
+              Save
             </Button>
           </DialogActions>
         </Box>
