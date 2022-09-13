@@ -1,11 +1,9 @@
 import * as React from "react";
 import Dashboard from "@components/Dashboard";
 import type { NextPage } from "next";
-import { GridCellParams } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
-import { useRouter } from "next/router";
 import Container from "@mui/material/Container";
 import {
   Avatar,
@@ -26,7 +24,10 @@ import { AddQuestionDialog } from "@components/Dashboard/addQuestion";
 import { EditQuestionDialog } from "@components/Dashboard/editQuestion";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirm } from "material-ui-confirm";
-
+type DataDelete = {
+  id: string;
+  title: string;
+};
 const QuizzesEdit: NextPage = ({ quizz }) => {
   const confirm = useConfirm();
   const [openEditInfo, setOpenEditInfo] = React.useState(false);
@@ -56,7 +57,7 @@ const QuizzesEdit: NextPage = ({ quizz }) => {
     setQuestionID("");
   };
 
-  const handleDeleteQuestion = (item) => {
+  const handleDeleteQuestion = (item: DataDelete) => {
     console.log("item", item);
     confirm({ description: `Are you sure to delete question ${item.title}.` })
       .then(() => {

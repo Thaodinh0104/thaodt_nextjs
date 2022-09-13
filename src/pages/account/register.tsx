@@ -1,72 +1,95 @@
-import type { NextPage } from "next";
-import { CssVarsProvider } from "@mui/joy/styles";
-import Sheet from "@mui/joy/Sheet";
-import Typography from "@mui/joy/Typography";
-import TextField from "@mui/joy/TextField";
-import Button from "@mui/joy/Button";
-import Link from "next/link";
-
-const Register: NextPage = () => {
+import * as React from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import FrontAccountLayout from "@components/Front/FrontAccountLayout";
+import { Grid, Link } from "@mui/material";
+import NextLink from "next/link";
+export default function Register() {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const email = data.get("email");
+    const password = data.get("password");
+  };
   return (
-    <CssVarsProvider>
-      <Sheet
+    <FrontAccountLayout bgColor={"#461a42"}>
+      <Box
         sx={{
-          maxWidth: 400,
+          maxWidth: 600,
+          width: "100%",
           mx: "auto", // margin left & right
           my: 4, // margin top & botom
-          py: 3, // padding top & bottom
-          px: 2, // padding left & right
+          py: 5, // padding top & bottom
+          px: 5, // padding left & right
           display: "flex",
           flexDirection: "column",
           gap: 2,
           borderRadius: "sm",
           boxShadow: "md",
+          textAlign: "center",
+          bgcolor: "#ffffff",
         }}
       >
         <div>
-          <Typography level="h4" component="h1">
+          <Typography variant="h3" component="h3">
             <b>Welcome!</b>
           </Typography>
-          <Typography level="body2">Register your new account</Typography>
+          <Typography fontWeight={"500"}>Register your new account</Typography>
         </div>
-        <TextField
-          // html input attribute
-          name="name"
-          type="text"
-          placeholder="Full Name"
-          // pass down to FormLabel as children
-          label="Full Name"
-        />
-        <TextField
-          // html input attribute
-          name="email"
-          type="email"
-          placeholder="johndoe@email.com"
-          // pass down to FormLabel as children
-          label="Email"
-        />
-        <TextField
-          name="password"
-          type="password"
-          placeholder="password"
-          label="Password"
-        />
-        <Button
-          sx={{
-            mt: 1, // margin top
-          }}
-        >
-          Register
-        </Button>
-        <Typography
-          endDecorator={<Link href="/account/login">Sign in</Link>}
-          fontSize="sm"
-          sx={{ alignSelf: "center" }}
-        >
-          Already has an account?
-        </Typography>
-      </Sheet>
-    </CssVarsProvider>
+
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="name"
+            type="text"
+            label="Your Full Name"
+            name="name"
+            autoComplete="name"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+          />
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Sign In
+          </Button>
+        </Box>
+        <Grid container>
+          <Grid item xs>
+            Have already an account?
+            <Link href="/account/login" component={NextLink}>
+              <a>Sign In</a>
+            </Link>
+          </Grid>
+        </Grid>
+      </Box>
+    </FrontAccountLayout>
   );
-};
-export default Register;
+}

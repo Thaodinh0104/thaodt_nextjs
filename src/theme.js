@@ -7,15 +7,16 @@ const theme = createTheme({
     text: {
       primary: "#73747e",
     },
+
     primary: {
-      main: "#381535",
+      main: "#461a42",
       darker: "#053e85",
     },
     secondary: {
       main: "#00C985",
     },
     neutral: {
-      main: "#73747e",
+      main: "#461a42",
       contrastText: "#fff",
     },
     error: {

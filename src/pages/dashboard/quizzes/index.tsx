@@ -9,12 +9,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import { useRouter } from "next/router";
-import { DeleteQuizz } from "@components/Dashboard/deleteQuiz";
 import { rows } from "_mocks_/questions";
-
+import { useConfirm } from "material-ui-confirm";
+import { useState } from "react";
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
-  { field: "name", headerName: "Title" },
+  { field: "name", headerName: "Title", width: 200 },
   { field: "description", headerName: "Description" },
   {
     field: "totalQuestions",
@@ -24,7 +24,7 @@ const columns: GridColDef[] = [
   {
     field: "category",
     headerName: "Category",
-
+    width: 150,
     renderCell: ({ value }) => (
       <Link href={`/dashboard/${value.id}`}>
         <a>{value.title}</a>
@@ -45,6 +45,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "addQuestion",
+    width: 150,
     headerName: "Add Question",
     sortable: false,
     renderCell: () => {
@@ -70,12 +71,9 @@ const columns: GridColDef[] = [
 ];
 
 const QuizzesList: NextPage = () => {
+  const confirm = useConfirm();
   const router = useRouter();
-  const [openDeleteQuizz, setOpenDeleteQuizz] = React.useState(false);
-  const [idValue, setIdValue] = React.useState("");
-  const handleClose = (value: string) => {
-    setOpenDeleteQuizz(false);
-  };
+  const [quizz, setQuizz] = useState(rows);
 
   function currentlySelected(params: GridCellParams) {
     const value = params.colDef.field;
@@ -90,26 +88,43 @@ const QuizzesList: NextPage = () => {
       });
     }
     if (value === "delete") {
-      setIdValue(params.row.id);
-      setOpenDeleteQuizz(true);
+      confirm({
+        description: `Are you sure to delete quiz ${params.row.name}.`,
+      })
+        .then(() => {
+          const newData = quizz.filter((e) => params.row.id !== e.id);
+          setQuizz(newData);
+          console.log(newData);
+        })
+        .catch(() => {
+          console.log("Deletion cancelled.");
+        });
     }
   }
-  console.log(openDeleteQuizz);
   return (
     <Dashboard>
-      <Box sx={{ height: "50vh" }}>
+      <Box
+        sx={{
+          height: "500px",
+          mt: "50px",
+          "& .MuiDataGrid-columnHeaderTitle": {
+            fontWeight: "700",
+            textAlign: "Center",
+            color: "#ffffff",
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            bgcolor: "#8d5a88",
+          },
+        }}
+      >
         <DataGrid
-          rows={rows}
+          sx={{ textAlign: "center" }}
+          rows={quizz}
           columns={columns}
           pageSize={5}
           rowsPerPageOptions={[5]}
           checkboxSelection
           onCellClick={currentlySelected}
-        />
-        <DeleteQuizz
-          id={idValue}
-          open={openDeleteQuizz}
-          onClose={handleClose}
         />
       </Box>
     </Dashboard>

@@ -4,10 +4,12 @@ import type { NextPage } from "next";
 import { GridCellParams } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
-import { useRouter } from "next/router";
+import { Router, useRouter } from "next/router";
+
 import Container from "@mui/material/Container";
 import {
   Avatar,
+  Button,
   Card,
   CardContent,
   CardMedia,
@@ -23,28 +25,7 @@ import Stack from "@mui/material/Stack";
 const QuizzesDetail: NextPage = () => {
   const router = useRouter();
   const [openDeleteQuizz, setOpenDeleteQuizz] = React.useState(false);
-  const [idValue, setIdValue] = React.useState("");
-  const handleClose = (value: string) => {
-    setOpenDeleteQuizz(false);
-  };
-  function currentlySelected(params: GridCellParams) {
-    const value = params.colDef.field;
 
-    if (!(value === "edit" || value === "delete" || value === "addQuestion")) {
-      return;
-    }
-    if (value == "edit") {
-      router.push({
-        pathname: "/dashboard/quizzes/[pid]",
-        query: { pid: params.row.id },
-      });
-    }
-    if (value === "delete") {
-      setIdValue(params.row.id);
-      setOpenDeleteQuizz(true);
-    }
-  }
-  console.log(openDeleteQuizz);
   return (
     <Dashboard>
       <Container>
@@ -69,7 +50,7 @@ const QuizzesDetail: NextPage = () => {
                 sx={{ width: 120, height: 120, borderRadius: "0" }}
               />
               <Box sx={{ paddingLeft: "30px" }}>
-                <Typography variant="p">Category ID</Typography>
+                <Typography>Category ID</Typography>
                 <Typography component={"h4"} variant="h4" color={"#222222"}>
                   Quiz title
                 </Typography>
@@ -114,18 +95,17 @@ const QuizzesDetail: NextPage = () => {
                   <Typography sx={{ fontSize: "8px" }}>3 days</Typography>
                 </Box>
               </Box>
-              <Box
-                sx={{
-                  paddingLeft: "30px",
-                  display: "flex",
-                  alignItems: "center",
-                }}
+              <Button
+                onClick={() =>
+                  router.push({
+                    pathname: "/dashboard/quizzes/[pid]/edit",
+                    query: { pid: 1 },
+                  })
+                }
+                startIcon={<EditIcon />}
               >
-                <EditIcon />
-                <Typography sx={{ marginLeft: "10px", fontSize: "12px" }}>
-                  Edit
-                </Typography>
-              </Box>
+                Edit
+              </Button>
             </Box>
           </Box>
         </Box>

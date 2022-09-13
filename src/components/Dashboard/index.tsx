@@ -16,11 +16,11 @@ import Link from "@mui/material/Link";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import React from "react";
-import { mainListItems, secondaryListItems } from "../Dashboard/listItems";
+import React, { useMemo } from "react";
 import Button from "@mui/material/Button";
 import { SimpleDialog } from "./createQuiz";
-
+import { useRouter } from "next/router";
+import MainListItems from "./listItems";
 function Copyright(props: any) {
   return (
     <Typography
@@ -89,6 +89,7 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 export default function Dashboard({ children }: { children: any }) {
+  const router = useRouter();
   const mdTheme = createTheme();
   const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
@@ -105,17 +106,14 @@ export default function Dashboard({ children }: { children: any }) {
     setOpenCreateQuizzez(false);
     setSelectedValue(value);
   };
+
   return (
     <>
       <ThemeProvider theme={mdTheme}>
         <Box sx={{ display: "flex" }}>
           <CssBaseline />
           <AppBar position="absolute" open={open}>
-            <Toolbar
-              sx={{
-                pr: "24px", // keep right padding when drawer closed
-              }}
-            >
+            <Toolbar sx={{ pr: "24px", background: "#461a42" }}>
               <IconButton
                 edge="start"
                 color="inherit"
@@ -187,9 +185,8 @@ export default function Dashboard({ children }: { children: any }) {
                 open={openCreateQuizzez}
                 onClose={handleClose}
               />
-              {mainListItems}
+              <MainListItems />
               <Divider sx={{ my: 1 }} />
-              {secondaryListItems}
             </List>
           </Drawer>
           <Box

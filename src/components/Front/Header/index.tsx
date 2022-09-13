@@ -12,13 +12,9 @@ import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Tooltip from "@mui/material/Tooltip";
-import Avatar from "@mui/material/Avatar";
 import List from "@mui/material/List";
-import Button from "@mui/material/Button";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const pages = ["Products", "Pricing", "Blog"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
 export const Header: React.FC = () => {
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -52,16 +48,18 @@ export const Header: React.FC = () => {
       <Container sx={{ py: 1 }} maxWidth="lg">
         <Toolbar disableGutters>
           <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
-            <CardMedia
-              component="img"
-              sx={{
-                // 16:9
-                height: "30px",
-                width: "auto",
-              }}
-              image="/assets/images/logo.png"
-              alt="random"
-            />
+            <NextLink href="/">
+              <CardMedia
+                component="img"
+                sx={{
+                  height: "30px",
+                  width: "auto",
+                  cursor: "pointer",
+                }}
+                image="/assets/images/logo.png"
+                alt="random"
+              />
+            </NextLink>
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"
@@ -106,7 +104,6 @@ export const Header: React.FC = () => {
                 ))}
               </Menu>
             </Box>
-
             <List sx={{ display: "flex" }} disablePadding={true}>
               {pages.map((page) => (
                 <Link key={page} component={NextLink} href="/account/login">
@@ -115,6 +112,7 @@ export const Header: React.FC = () => {
                     sx={{
                       mx: 2,
                       fontSize: 16,
+                      cursor: "pointer",
                     }}
                     color="text.primary"
                   >
@@ -152,32 +150,32 @@ export const Header: React.FC = () => {
                 </MenuItem>
               ))}
             </Menu> */}
-            <Button
-              size="large"
-              sx={{
-                bgcolor: "#461a42",
-                borderRadius: 2,
-                textAlign: "center",
-                color: "#ffffff",
-                textTransform: "unset",
-                fontSize: "0.9rem",
-                fontWeight: "700",
-                lineHeight: "30px",
-                paddingX: "20px",
-                "&.MuiButtonBase-root:hover": {
+            <Link component={NextLink} href="/account/login">
+              <Typography
+                textAlign="center"
+                display="flex"
+                alignItems="center"
+                sx={{
                   bgcolor: "#461a42",
-                },
-              }}
-              endIcon={
-                <ArrowForwardIosIcon
-                  sx={{
-                    width: "1rem",
-                  }}
-                />
-              }
-            >
-              Sign up
-            </Button>
+                  borderRadius: 2,
+                  textAlign: "center",
+                  color: "#ffffff",
+                  textTransform: "unset",
+                  fontSize: "1rem",
+                  fontWeight: "700",
+                  lineHeight: "50px",
+                  paddingX: "20px",
+                  cursor: "pointer",
+                  "&.MuiTypography-root:hover": {
+                    bgcolor: "#994192",
+                  },
+                }}
+                color="text.primary"
+              >
+                Sign up
+                <ArrowForwardIosIcon fontSize="small" />
+              </Typography>
+            </Link>
           </Box>
         </Toolbar>
       </Container>

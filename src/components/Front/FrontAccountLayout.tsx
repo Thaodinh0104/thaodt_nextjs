@@ -1,16 +1,14 @@
 import * as React from "react";
-
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import GlobalStyles from "@mui/material/GlobalStyles";
-import { Header } from "./Header";
-import { Footer } from "./Footer";
+import { HeaderAccount } from "./Header/headerAccount";
 
 type Props = {
   children: any;
   bgColor?: any;
 };
-export default function FrontLayout({ children, bgColor }: Props) {
+export default function FrontAccountLayout({ children, bgColor }: Props) {
   console.log(bgColor);
   return (
     <React.Fragment>
@@ -19,13 +17,20 @@ export default function FrontLayout({ children, bgColor }: Props) {
           styles={{ ul: { margin: 0, padding: 0, listStyle: "none" } }}
         />
         <CssBaseline />
-        <Header />
+        <HeaderAccount />
         {/* Hero unit */}
-        <Box sx={{ pt: 8, pb: 6 }}>{children}</Box>
+        <Box
+          sx={{
+            pt: 8,
+            pb: 6,
+            display: "flex",
+            alignItems: "center",
+            minHeight: "calc( 100vh - 80px)",
+          }}
+        >
+          {children}
+        </Box>
         {/* End hero unit */}
-
-        <Footer />
-        {/* End footer */}
       </Box>
     </React.Fragment>
   );
