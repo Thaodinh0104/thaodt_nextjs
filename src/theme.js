@@ -5,7 +5,7 @@ import { red } from "@mui/material/colors";
 const theme = createTheme({
   palette: {
     text: {
-      primary: "#73747e",
+      primary: "#292A3A",
     },
 
     primary: {
@@ -37,6 +37,10 @@ const theme = createTheme({
       '"Segoe UI Symbol"',
     ].join(","),
     fontSize: 16,
+    h2: {
+      fontWeight: 700,
+      fontSize: 40,
+    },
   },
 });
 

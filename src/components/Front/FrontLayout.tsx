@@ -11,7 +11,6 @@ type Props = {
   bgColor?: any;
 };
 export default function FrontLayout({ children, bgColor }: Props) {
-  console.log(bgColor);
   return (
     <React.Fragment>
       <Box sx={{ background: bgColor }}>

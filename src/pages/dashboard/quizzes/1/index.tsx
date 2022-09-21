@@ -5,7 +5,6 @@ import { GridCellParams } from "@mui/x-data-grid";
 import Box from "@mui/material/Box";
 import EditIcon from "@mui/icons-material/Edit";
 import { Router, useRouter } from "next/router";
-
 import Container from "@mui/material/Container";
 import {
   Avatar,
@@ -13,7 +12,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  IconButton,
   Typography,
 } from "@mui/material";
 import SmartDisplayIcon from "@mui/icons-material/SmartDisplay";
@@ -24,8 +22,6 @@ import Stack from "@mui/material/Stack";
 
 const QuizzesDetail: NextPage = () => {
   const router = useRouter();
-  const [openDeleteQuizz, setOpenDeleteQuizz] = React.useState(false);
-
   return (
     <Dashboard>
       <Container>

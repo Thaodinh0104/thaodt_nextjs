@@ -9,13 +9,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import IconButton from "@mui/material/IconButton";
 import { useRouter } from "next/router";
-import { rows } from "_mocks_/questions";
+import { quizzMock } from "_mocks_/quizz";
 import { useConfirm } from "material-ui-confirm";
 import { useState } from "react";
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 50 },
   { field: "name", headerName: "Title", width: 200 },
-  { field: "description", headerName: "Description" },
+  { field: "description", headerName: "Description", width: 200 },
   {
     field: "totalQuestions",
     headerName: "Questions",
@@ -73,7 +73,7 @@ const columns: GridColDef[] = [
 const DashBoardIndex: NextPage = () => {
   const confirm = useConfirm();
   const router = useRouter();
-  const [quizz, setQuizz] = useState(rows);
+  const [quizz, setQuizz] = useState(quizzMock);
 
   function currentlySelected(params: GridCellParams) {
     const value = params.colDef.field;

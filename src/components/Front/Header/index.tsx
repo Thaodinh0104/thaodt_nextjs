@@ -14,7 +14,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import List from "@mui/material/List";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+
 const pages = ["Products", "Pricing", "Blog"];
+
 export const Header: React.FC = () => {
   const router = useRouter();
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
