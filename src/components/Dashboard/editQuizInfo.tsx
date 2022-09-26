@@ -15,15 +15,34 @@ export interface SimpleDialogProps {
   open: boolean;
   idValue: string;
   onClose: (value: string) => void;
+  data: Quizz;
 }
-export function EditQuizInfo(props: SimpleDialogProps) {
+type Quizz = {
+  category: string;
+  description: string;
+  id: string;
+  questions: [];
+  title: string;
+  user: string;
+};
+export function EditQuizInfo({
+  open,
+  idValue,
+  onClose,
+  data,
+}: {
+  open: boolean;
+  idValue: any;
+  onClose: boolean;
+  data: Quizz;
+}) {
   const { onClose, idValue, open } = props;
   const [category, setCategory] = useState("10");
-  const [name, setName] = useState("Name quiz");
+  const [name, setName] = useState(data.title);
   const handleClose = () => {
     onClose(idValue);
-    setCategory("10");
-    setName("Name quiz");
+    setCategory(data.category);
+    setName(data.title);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

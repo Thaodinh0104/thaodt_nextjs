@@ -10,7 +10,13 @@ import Button from "@mui/material/Button";
 import Image from "next/image";
 import Grid from "@mui/material/Unstable_Grid2";
 import { quizzMock } from "_mocks_/quizz";
-import { List, ListItem, ListItemText } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
+} from "@mui/material";
 import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import { array } from "yup";
 import { positions } from "@mui/system";
@@ -20,10 +26,11 @@ import useAppContext from "context/AppContext";
 type Answer = {
   title: string;
   id: string;
+  questionID: string;
 };
 interface Question {
   title: string;
-  correctAnswer: string;
+  correct_answer: string;
   id: string;
   anwser: Answer;
 }
@@ -31,7 +38,7 @@ interface Quizz {
   category: string;
   description: string;
   id: string;
-  questions: Question;
+  questions: [];
   title: string;
   user: string;
 }
@@ -43,36 +50,39 @@ interface DataAnswer {
 type Color = "primary" | "secondary";
 
 export type OutResult = {
-  output: DataAnswer;
-  onSubmitData: (data: DataAnswer) => any;
+  output: any;
+  onSubmitData: any;
 };
 
-function QuestionItem({
+function AnswerItem({
   index,
   questionID,
   item,
+  indexQuestion,
   handleChoise,
   choiseData,
 }: {
   index: any;
   questionID: any;
   item: Question;
+  indexQuestion: any;
   handleChoise: any;
   choiseData: any;
 }) {
-  if (choiseData)
-    return (
-      <ListItem
-        className={clsx(
-          item.id === choiseData.chosieAnswer &&
-            choiseData.chosieAnswer !== "" &&
-            "active"
-        )}
-        onClick={() => handleChoise(questionID, item.id)}
-      >
-        {item.title}
-      </ListItem>
-    );
+  return (
+    <ListItem
+      className={clsx(
+        item.id === choiseData?.chosieAnswer &&
+          choiseData.chosieAnswer !== "" &&
+          "active"
+      )}
+      onClick={() =>
+        handleChoise(index, questionID, item.id, indexQuestion, choiseData)
+      }
+    >
+      {item.title}
+    </ListItem>
+  );
 }
 
 const Quizz: NextPage = ({ quizz }) => {
@@ -83,65 +93,147 @@ const Quizz: NextPage = ({ quizz }) => {
   const [nextQuestion, setNextQuestion] = useState(0);
   const [prevQuestion, setPrevQuestion] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-
+  const [dataQuestions, setDataQuestions] = useState<Question[]>([]);
+  const [dataAnswers, setDataAnswers] = useState<Answer[]>([]);
+  const [score, setScore] = useState(0);
   const { output, onSubmitData } = useAppContext() as OutResult;
+  const [handleClose, setHandleClose] = useState(true);
+  const [open, setOpen] = useState(false);
+  /**
+   * Get list question by quiz id
+   */
+
   useEffect(() => {
-    const newData = quizz.questions?.map((questionAnswer: DataAnswer) => {
-      return { id: questionAnswer.id, chosieAnswer: "" };
-    });
-    setLisAnswer(newData);
-  }, []);
+    async function fetchQuestions() {
+      const response = await fetch("http://localhost:3000/api/questions");
+      const questions = await response.json();
+      const newQuestions = questions.filter((item: Question) =>
+        quizz.questions.includes(item.id)
+      );
+      setDataQuestions(newQuestions);
+    }
+    fetchQuestions();
+  }, [quizz]);
+
+  /**
+   * Get list answer by question id
+   */
+  useEffect(() => {
+    async function fetchAnswers() {
+      const response = await fetch("http://localhost:3000/api/answers");
+      const answers = await response.json();
+
+      if (dataQuestions.length > 0) {
+        const newAnswer = answers.filter(
+          (item: Answer) =>
+            item.question_id == dataQuestions[currentQuestion].id
+        );
+        setDataAnswers(newAnswer);
+      }
+    }
+    fetchAnswers();
+  }, [dataQuestions, currentQuestion]);
+  /**
+   * Stop Play after few second (time = totalQuestion * 25000ms)
+   */
+  useEffect(() => {
+    if (dataQuestions.length > 0) {
+      const time = dataQuestions.length * 25000;
+      console.log("time" + time);
+      setTimeout(function () {
+        const resultOutput = dataQuestions.filter((question) => {
+          return listAnswer?.some(
+            (answer) =>
+              answer.id === question.id &&
+              +answer.chosieAnswer == +question.correct_answer
+          );
+        });
+        console.log("resultOutput", resultOutput);
+        const scoreValue = resultOutput.length * 10;
+        setScore(scoreValue);
+        setOpen(true);
+        setHandleClose(false);
+        setTimeout(function () {
+          router.push({
+            pathname: `/${router.asPath}/result`,
+          });
+        }, 10000);
+      }, time);
+    }
+  }, [dataQuestions]);
+  useEffect(() => {
+    onSubmitData(score);
+  }, [sc]);
 
   const handleChoise = (
     index: number,
     idQuestion: string,
-    correctAnswer: string
+    id: string,
+    indexQuestion: number,
+    choiseData: any
   ) => {
-    setChoise(idQuestion);
-    const newDataAnswer =
-      listAnswer.length &&
-      listAnswer.map((item: DataAnswer) => {
-        return {
-          ...item,
-          id: item.id,
-          chosieAnswer:
-            correctAnswer && idQuestion == item.id
-              ? correctAnswer
-              : item.chosieAnswer,
-        };
-      });
-    const current = index;
-    setCurrentQuestion(current);
-    setPrevQuestion(index - 1);
-    setNextQuestion(index + 1);
+    const newDataAnswer = listAnswer;
+
+    if (newDataAnswer.find((item) => item.id === idQuestion)) {
+      newDataAnswer =
+        listAnswer.length &&
+        listAnswer?.map((item: DataAnswer) => {
+          return {
+            ...item,
+            id: item.id,
+            chosieAnswer: idQuestion == item.id ? id : item.chosieAnswer,
+          };
+        });
+    } else {
+      newDataAnswer = [...newDataAnswer, { id: idQuestion, chosieAnswer: id }];
+    }
+
+    if (indexQuestion + 1 < quizz.questions.length)
+      setCurrentQuestion(indexQuestion + 1);
+    setPrevQuestion(indexQuestion);
+    setNextQuestion(indexQuestion + 2);
     setLisAnswer(newDataAnswer);
   };
-
   const handelPrevQuestion = (index: Number) => {
-    setCurrentQuestion(index);
-    setPrevQuestion(index - 1);
-    setNextQuestion(index + 1);
+    setCurrentQuestion(+index);
+    setPrevQuestion(+index - 1);
+    setNextQuestion(+index + 1);
   };
   const handelNextQuestion = (index: Number) => {
-    setCurrentQuestion(index);
-    setPrevQuestion(index - 1);
-    setNextQuestion(index + 1);
+    setCurrentQuestion(+index);
+    setPrevQuestion(+index - 1);
+    setNextQuestion(+index + 1);
   };
   const handleSubmit = () => {
-    console.log("questions", quizz.questions);
-    console.log("listAnswer", listAnswer);
-
-    const resultOutput = quizz.questions.filter((question) => {
-      return listAnswer.some(
+    const resultOutput = dataQuestions.filter((question) => {
+      return listAnswer?.some(
         (answer) =>
           answer.id === question.id &&
-          +answer.chosieAnswer === question.correctAnswer
+          +answer.chosieAnswer == +question.correct_answer
       );
     });
     console.log("resultOutput", resultOutput);
-    // router.push({
-    //   pathname: `/${router.asPath}/result`,
-    // });
+    const scoreValue = resultOutput.length * 10;
+    setScore(scoreValue);
+
+    async function AddResult(score: Number, quizzID: String) {
+      const response = await fetch("http://localhost:3000/api/user/1", {
+        method: "POST",
+        body: JSON.stringify({
+          result: [{ quizz_id: quizzID, result: score }],
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log("id" + quizzID);
+      console.log(data);
+    }
+    AddResult(score, quizz.id);
+    router.push({
+      pathname: `/${router.asPath}/result`,
+    });
   };
 
   return (
@@ -149,9 +241,9 @@ const Quizz: NextPage = ({ quizz }) => {
       <Box sx={{ position: "relative" }}>
         <Container sx={{ py: 5, position: "relative" }} maxWidth="lg">
           <Box>
-            {quizz.questions.map((questionData, index) => (
+            {dataQuestions.map((questionData, indexQuestion) => (
               <Box key={questionData.id}>
-                {index == currentQuestion && (
+                {indexQuestion == currentQuestion && (
                   <>
                     <Box display={"flex"} justifyContent={"space-between"}>
                       <Typography
@@ -221,14 +313,15 @@ const Quizz: NextPage = ({ quizz }) => {
                             },
                           }}
                         >
-                          {questionData.answers.map((item, index) => {
+                          {dataAnswers.map((item: Answer, index) => {
                             return (
-                              <QuestionItem
+                              <AnswerItem
                                 key={index}
                                 item={item}
+                                indexQuestion={indexQuestion}
                                 index={index}
                                 handleChoise={handleChoise}
-                                choiseData={listAnswer.find(
+                                choiseData={listAnswer?.find(
                                   (e) => questionData.id == e.id
                                 )}
                                 questionID={questionData.id}
@@ -293,13 +386,18 @@ const Quizz: NextPage = ({ quizz }) => {
           </Box>
         </Container>
       </Box>
+      <Dialog onClose={handleClose} open={open}>
+        <DialogTitle>TimeOut!</DialogTitle>
+      </Dialog>
     </FrontLayout>
   );
 };
 
 export default Quizz;
 export async function getStaticPaths() {
-  const paths = quizzMock.map((item) => ({
+  const res = await fetch("http://localhost:3000/api/quizzes");
+  const quizz = await res.json();
+  const paths = quizz.map((item: Quizz) => ({
     params: { id: item.id },
   }));
 
@@ -312,8 +410,8 @@ export async function getStaticPaths() {
 // `getStaticPaths` requires using `getStaticProps`
 export async function getStaticProps(context: any) {
   const { params } = context;
-  const quizz = await quizzMock.find((e) => params.id == e.id);
-  console.log(quizz);
+  const res = await fetch(`http://localhost:3000/api/quizzes/${params.id}`);
+  const quizz = await res.json();
   return {
     // Passed to the page component as props
     props: { quizz },

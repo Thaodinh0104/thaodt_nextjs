@@ -9,10 +9,12 @@ export default function handler(req, res) {
   } else if (req.method === 'POST') {
     const title = req.body.title
     const description = req.body.description
+    const questionID = req.body.question_id
     const newAnswer = {
       id: Date.now(),
       title,
-      description
+      description,
+      questionID
     }
     ANSWER_MOCK_DATA.push(newAnswer)
     res.status(201)

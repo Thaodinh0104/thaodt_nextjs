@@ -6,28 +6,67 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormGroup from "@mui/material/FormGroup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
+import { useRouter } from "next/router";
 export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
   onClose: (value: string) => void;
 }
+interface Category {}
 export function SimpleDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
   const [age, setAge] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [quizz, setQuizz] = useState("");
+  const router = useRouter();
+  // Get Category
+  useEffect(() => {
+    async function fetchCategory() {
+      const response = await fetch("http://localhost:3000/api/categories");
+      const category = await response.json();
+      setCategories(category);
+    }
+    fetchCategory();
+  }, []);
+
+  // Close popup create quizz
   const handleClose = () => {
     onClose(selectedValue);
     console.log(onClose);
   };
 
+  // Handle submit data create quizz
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log(data.get("demo-select-small"));
+    const title = data.get("title");
+    const description = data.get("description");
+    const category = data.get("category");
+
+    async function addQuizz(title: String, description: String, catID: String) {
+      const response = await fetch("http://localhost:3000/api/quizzes", {
+        method: "POST",
+        body: JSON.stringify({
+          title: title,
+          description: description,
+          category: catID,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+
+      setQuizz(data.id);
+      console.log("sdsd" + quizz);
+    }
+    addQuizz(title, description, category);
+    router.push(`/dashboard/quizzes/${quizz}`);
   };
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -62,7 +101,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
           component="form"
           onSubmit={handleSubmit}
           noValidate
-          sx={{ mt: 1, padding: "20px" }}
+          sx={{ mt: 1, padding: "20px", width: "100%" }}
         >
           <FormGroup>
             <label htmlFor="">1. Name this quiz</label>
@@ -70,32 +109,44 @@ export function SimpleDialog(props: SimpleDialogProps) {
               margin="normal"
               required
               fullWidth
-              id="name"
-              name="name"
+              id="title"
+              name="title"
               placeholder="Enter a quiz name"
               autoFocus
             />
           </FormGroup>
-
+          <FormGroup>
+            <label htmlFor="">2. Description this quiz</label>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="description"
+              name="description"
+              placeholder="Enter desciption"
+              autoFocus
+            />
+          </FormGroup>
           <FormGroup sx={{ mt: "20px" }}>
             <label>2. Choose Category</label>
             <Select
-              labelId="demo-select-small"
-              id="demo-select-small"
-              name="demo-select-small"
+              labelId="category"
+              id="category"
+              name="category"
               value={age}
               label="Age"
               onChange={handleChange}
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Category 1</MenuItem>
-              <MenuItem value={20}>Category 2</MenuItem>
-              <MenuItem value={30}>Category 3</MenuItem>
+              {categories.map((cat, index) => {
+                return (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
           </FormGroup>
-          <FormGroup sx={{ mt: "20px" }}>
+          {/* <FormGroup sx={{ mt: "20px" }}>
             <FileUpload
               multiple={false}
               value={files}
@@ -104,7 +155,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
               buttonText="Upload image"
               maxSize={7340032}
             />
-          </FormGroup>
+          </FormGroup> */}
 
           <DialogActions
             sx={{ display: "flex", width: "100%", paddingX: "20px" }}
@@ -115,7 +166,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
             <Button
               type="submit"
               variant="contained"
-              sx={{ mt: 3, mb: 2, width: "50%" }}
+              sx={{ mt: 3, mb: 2, width: "50%", bgcolor: "#461a42" }}
             >
               Next
             </Button>
