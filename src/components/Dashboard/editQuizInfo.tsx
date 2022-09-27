@@ -6,17 +6,17 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import FormGroup from "@mui/material/FormGroup";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
-export interface SimpleDialogProps {
-  open: boolean;
-  idValue: string;
-  onClose: (value: string) => void;
-  data: Quizz;
-}
+// export interface SimpleDialogProps {
+//   open: boolean;
+//   idValue: string;
+//   onClose: (value: string) => void;
+//   data: Quizz;
+// }
 type Quizz = {
   category: string;
   description: string;
@@ -33,22 +33,91 @@ export function EditQuizInfo({
 }: {
   open: boolean;
   idValue: any;
-  onClose: boolean;
+  onClose: any;
   data: Quizz;
 }) {
-  const { onClose, idValue, open } = props;
-  const [category, setCategory] = useState("10");
-  const [name, setName] = useState(data.title);
+  const [categories, setCategories] = useState([]);
+  const [category, setCategory] = useState(data.category);
+  const [description, setDescription] = useState(data.description);
+  // const [dataUpdate, setDataUpdate] = useState<Quizz>();
+  const [title, setTitle] = useState(data.title);
+  // Get Category
+  useEffect(() => {
+    async function fetchCategory() {
+      const response = await fetch("http://localhost:3000/api/categories");
+      const category = await response.json();
+      setCategories(category);
+    }
+    fetchCategory();
+  }, [category]);
+  // Update Quizz Infor
+  // useEffect(() => {
+  //   async function update(datas) {
+  //     const response = await fetch(
+  //       `http://localhost:3000/api/quizzes/${datas.id}`,
+  //       {
+  //         method: "POST",
+  //         body: JSON.stringify({
+  //           result: [
+  //             {
+  //               title: datas.title,
+  //               description: datas.description,
+  //               category: datas.category,
+  //             },
+  //           ],
+  //         }),
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+  //     const data = await response.json();
+
+  //     console.log(data);
+  //   }
+  //   update(dataUpdate);
+  // }, [dataUpdate]);
+  //handle Close
   const handleClose = () => {
     onClose(idValue);
     setCategory(data.category);
-    setName(data.title);
+    setTitle(data.title);
+    setDescription(data.description);
   };
-
+  // handle submit edit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log(data.get("demo-select-small"));
+    const dataUpdated = new FormData(event.currentTarget);
+    const newData = {
+      id: data.id,
+      title: dataUpdated.get("title"),
+      description: dataUpdated.get("description"),
+      category: dataUpdated.get("category"),
+      questions: data.questions,
+      user: data.user,
+    };
+    async function update(datas) {
+      const response = await fetch(
+        `http://localhost:3000/api/quizzes/${datas.id}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            title: datas.title,
+            description: datas.description,
+            category: datas.category,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+
+      console.log(data);
+    }
+    update(newData);
+    // setDataUpdate(newData);
+    //console.log(dataUpdate);
   };
 
   const handleChange = (event: SelectChangeEvent) => {
@@ -57,7 +126,14 @@ export function EditQuizInfo({
   const [files, setFiles] = useState<File[]>([]);
   return (
     <Dialog onClose={handleClose} open={open}>
-      <Box sx={{ display: "flex", alignItems: "center", paddingX: "20px" }}>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          paddingX: "20px",
+          width: "100%",
+        }}
+      >
         <Avatar
           alt="Remy Sharp"
           src="/assets/images/quiz.png"
@@ -83,7 +159,7 @@ export function EditQuizInfo({
           component="form"
           onSubmit={handleSubmit}
           noValidate
-          sx={{ mt: 1, padding: "20px" }}
+          sx={{ mt: 1, padding: "20px", width: "100%" }}
         >
           <FormGroup>
             <label htmlFor="">1. Name this quiz</label>
@@ -91,42 +167,46 @@ export function EditQuizInfo({
               margin="normal"
               required
               fullWidth
-              id="name"
-              name="name"
+              id="title"
+              name="title"
               placeholder="Enter a quiz name"
-              onChange={(e) => setName(e.target.value)}
-              value={name}
+              onChange={(e) => setTitle(e.target.value)}
+              value={title}
               autoFocus
             />
           </FormGroup>
-
+          <FormGroup>
+            <label htmlFor="">2. Description this quiz</label>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="description"
+              name="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter desciption"
+              autoFocus
+            />
+          </FormGroup>
           <FormGroup sx={{ mt: "20px" }}>
             <label>2. Choose Category</label>
             <Select
-              labelId="demo-select-small"
-              id="demo-select-small"
-              name="demo-select-small"
+              labelId="category"
+              id="category"
+              name="category"
               value={category}
               label="Age"
               onChange={handleChange}
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={10}>Category 1</MenuItem>
-              <MenuItem value={20}>Category 2</MenuItem>
-              <MenuItem value={30}>Category 3</MenuItem>
+              {categories.map((cat, index) => {
+                return (
+                  <MenuItem key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </MenuItem>
+                );
+              })}
             </Select>
-          </FormGroup>
-          <FormGroup sx={{ mt: "20px" }}>
-            <FileUpload
-              multiple={false}
-              value={files}
-              onChange={setFiles}
-              title="Click to select or drag and drop a image. (Max size: 7MB)"
-              buttonText="Upload image"
-              maxSize={7340032}
-            />
           </FormGroup>
 
           <DialogActions

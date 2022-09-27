@@ -37,7 +37,6 @@ export function SimpleDialog(props: SimpleDialogProps) {
   // Close popup create quizz
   const handleClose = () => {
     onClose(selectedValue);
-    console.log(onClose);
   };
 
   // Handle submit data create quizz
@@ -63,7 +62,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
       const data = await response.json();
 
       setQuizz(data.id);
-      console.log("sdsd" + quizz);
+      console.log(data);
     }
     addQuizz(title, description, category);
     router.push(`/dashboard/quizzes/${quizz}`);

@@ -178,8 +178,6 @@ export function EditQuestionDialog(props: EditQuestionDialogProps) {
     setAnswerList((prevData) => [...prevData, data]);
   };
 
-  console.log("answerList", answerList);
-
   const handleChangeText = (key: string, val: string) => {
     const questionItem: ItemQuestion = {
       key,
@@ -199,7 +197,6 @@ export function EditQuestionDialog(props: EditQuestionDialogProps) {
 
   const handleDeleteItem = (key: string) => {
     const newData = answerList.filter((item) => item.key !== key);
-    console.log("data", newData);
     setAnswerList(newData);
   };
   const handleCorrectAnswer = (key: string) => {

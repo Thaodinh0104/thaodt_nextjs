@@ -58,8 +58,6 @@ function QuestionItem({
   handleDeleteQuestion: any;
   handleEditQuestionOpen: any;
 }) {
-  console.log(data);
-
   const [dataAnswers, setDataAnswers] = useState<Answer[]>([]);
   /**
    * Get list answer by question id
@@ -261,7 +259,6 @@ const Quizzes: NextPage = ({ quizz }) => {
   //   }
   //   fetchAnswers();
   // }, [dataQuestions]);
-  console.log(dataQuestions);
 
   const handleEditInfoOpen = () => {
     setOpenEditInfo(true);
@@ -283,14 +280,12 @@ const Quizzes: NextPage = ({ quizz }) => {
   };
 
   const handleDeleteQuestion = (item: DataDelete) => {
-    console.log("item", item);
     confirm({ description: `Are you sure to delete question ${item.title}.` })
       .then(() => {
         const newData = quizData.questions.filter((e) => item.id !== e.id);
         setQuizData({ ...quizData, questions: newData });
       })
       .catch(() => {
-        console.log(quizData);
         console.log("Deletion cancelled.");
       });
   };
