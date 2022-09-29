@@ -10,24 +10,21 @@ import AddIcon from "@mui/icons-material/Add";
 import { IconButton } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import React from "react";
-export interface EditQuestionDialogProps {
-  open: boolean;
-  idQuizz: string;
-  idQuestion: string;
-  onClose: (value: string) => void;
-}
 
 function AnswerItem({
   item,
   handleChangeText,
   handleDeleteItem,
   handleCorrectAnswer,
+  correct,
 }: {
-  item: ItemQuestion;
+  item: Answer;
   handleChangeText: any;
   handleDeleteItem: any;
   handleCorrectAnswer: any;
+  correct: boolean;
 }) {
+  console.log(correct);
   return (
     <Box gridColumn="span 3">
       <FormGroup
@@ -41,7 +38,7 @@ function AnswerItem({
         <Box display={"flex"} justifyContent={"space-between"}>
           <IconButton
             aria-label="delete"
-            onClick={() => handleDeleteItem(item.key)}
+            onClick={() => handleDeleteItem(item.id)}
             sx={{
               color: "#ffffff",
               borderRadius: "5px",
@@ -55,14 +52,16 @@ function AnswerItem({
           </IconButton>
           <IconButton
             aria-label="corrected"
-            onClick={() => handleCorrectAnswer(item.key)}
+            onClick={() => handleCorrectAnswer(item.id)}
             sx={{
               color: "#ffffff",
               borderRadius: "5px",
               width: "40px",
               height: "40px",
               p: "5px",
-              backgroundColor: "rgba(255, 255, 255, 0.2)",
+              backgroundColor: correct
+                ? "rgb(9 241 131 / 53%)"
+                : "rgba(255, 255, 255, 0.2)",
             }}
           >
             <CheckCircleIcon />
@@ -74,8 +73,8 @@ function AnswerItem({
           fullWidth
           id="name"
           name="name"
-          value={item.content}
-          onChange={(e) => handleChangeText(item.key, e.target.value)}
+          value={item.title}
+          onChange={(e) => handleChangeText(item.id, e.target.value)}
           placeholder="Type an answer option here..."
           sx={{
             "& input": {
@@ -97,9 +96,11 @@ function AnswerItem({
   );
 }
 
-interface ItemQuestion {
-  key: string;
-  content: string;
+interface Answer {
+  title: string;
+  id: string;
+  question_id?: string;
+  description?: string;
 }
 
 function makeid(length: number) {
@@ -112,96 +113,74 @@ function makeid(length: number) {
   }
   return result;
 }
-
-export function EditQuestionDialog(props: EditQuestionDialogProps) {
-  const { onClose, idQuizz, idQuestion, open } = props;
-  const [question, setQuestion] = useState("Question Title");
-  const [correctAnswer, setCorrectAnswer] = useState("1");
-  const [answerList, setAnswerList] = useState<ItemQuestion[]>([
-    {
-      key: "clLwCg",
-      content: "Answer 1",
-    },
-    {
-      key: "Fpmlef",
-      content: "Answer 2",
-    },
-    {
-      key: "swBOY5",
-      content: "Answer 3",
-    },
-    {
-      key: "ZGhdJY",
-      content: "Answer 4",
-    },
-  ]);
-
+export function EditQuestionDialog({
+  open,
+  onClose,
+  data,
+  dataSubmit,
+}: {
+  open: boolean;
+  onClose: any;
+  data: any;
+  dataSubmit: any;
+}) {
+  const [questionTitle, setQuestionTitle] = useState("");
+  const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [answerList, setAnswerList] = useState<Answer[]>([]);
+  useEffect(() => {
+    setQuestionTitle(data.title);
+    setAnswerList(data.answers);
+    setCorrectAnswer(data.correct_answer);
+  }, [data]);
+  // Handle close popup when click cancel button
   const handleClose = () => {
-    onClose(idQuizz);
-    setQuestion("");
-    setCorrectAnswer("");
-    setAnswerList([
-      {
-        key: "clLwCg",
-        content: "Answer 1",
-      },
-      {
-        key: "Fpmlef",
-        content: "Answer 2",
-      },
-      {
-        key: "swBOY5",
-        content: "Answer 3",
-      },
-      {
-        key: "ZGhdJY",
-        content: "Answer 4",
-      },
-    ]);
+    onClose(data.id);
+    setQuestionTitle(data.title);
+    setCorrectAnswer(data.correct_answer);
+    setAnswerList(data.answers);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = {
-      ID: "",
-      name: question,
-      answer: answerList,
-      correct: correctAnswer,
+    const newData = {
+      id: data.id,
+      title: questionTitle,
+      answers: answerList,
+      correct_answer: correctAnswer,
     };
+    dataSubmit(newData);
+    onClose(data.id);
   };
+  // Handle Add more Answer
   const handleAddMoreAnswer = () => {
-    const data: ItemQuestion = {
-      key: makeid(6),
-      content: "",
+    if (answerList.length >= 4) return false;
+    const data: Answer = {
+      id: makeid(6),
+      title: "",
     };
-
     setAnswerList((prevData) => [...prevData, data]);
   };
-
-  const handleChangeText = (key: string, val: string) => {
-    const questionItem: ItemQuestion = {
-      key,
-      content: val,
-    };
-
-    const newData = answerList.map((item) => {
-      if (item.key == questionItem.key) {
-        item = questionItem;
+  // Handle Change text
+  const handleChangeText = (id: string, val: string) => {
+    const newData = answerList?.map((item) => {
+      if (item.id == id) {
+        item = { ...item, title: val };
       }
-
       return item;
     });
-
     setAnswerList(newData);
   };
 
   const handleDeleteItem = (key: string) => {
-    const newData = answerList.filter((item) => item.key !== key);
+    const newData = answerList.filter((item) => item.id !== key);
     setAnswerList(newData);
   };
+  // Handle Choose Correct Answers
   const handleCorrectAnswer = (key: string) => {
     setCorrectAnswer(key);
   };
+
+  if (!data) return <></>;
   return (
     <Dialog
       onClose={handleClose}
@@ -231,8 +210,8 @@ export function EditQuestionDialog(props: EditQuestionDialogProps) {
             fullWidth
             id="name"
             name="name"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            value={questionTitle}
+            onChange={(e) => setQuestionTitle(e.target.value)}
             placeholder="Type your question here"
             sx={{
               "& input": {
@@ -276,7 +255,7 @@ export function EditQuestionDialog(props: EditQuestionDialogProps) {
               gridTemplateColumns="repeat(12, 1fr)"
               gap={2}
             >
-              {answerList.map((item, index) => {
+              {answerList?.map((item, index) => {
                 return (
                   <AnswerItem
                     key={index}
@@ -284,6 +263,7 @@ export function EditQuestionDialog(props: EditQuestionDialogProps) {
                     handleChangeText={handleChangeText}
                     handleDeleteItem={handleDeleteItem}
                     handleCorrectAnswer={handleCorrectAnswer}
+                    correct={correctAnswer == item.id ? true : false}
                   />
                 );
               })}

@@ -10,7 +10,6 @@ import LayersIcon from "@mui/icons-material/Layers";
 import Router from "next/router";
 
 export default function MainListItems() {
-  console.log("sdfsd");
   return (
     <React.Fragment>
       <ListItemButton onClick={() => Router.push("/dashboard")}>

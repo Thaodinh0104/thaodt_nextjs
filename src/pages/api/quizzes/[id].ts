@@ -1,8 +1,32 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import Quizz from "pages/quizz/[id]";
 import { ANSWER_MOCK_DATA } from "../answers/answers";
 import { QUESTION_MOCK_DATA } from "../questions/question";
 import { QUIZ_MOCK_DATA } from "./quizzes";
+interface Answer {
+  id: string;
+  title: string;
+  question_id: string;
+  description: string;
+}
+interface Question {
+  id: string;
+  title: string;
+  description: string;
+  correct_answer: string;
+}
+interface Quizz {
+  category: string;
+  description: string;
+  id: string;
+  questions: string[];
+  title: string;
+  user: string;
+}
 
+interface QuestionResponse extends Question {
+  answers?: Answer;
+}
 export default function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
@@ -12,16 +36,20 @@ export default function handler(
 
   switch (method) {
     case "GET":
-      const quizzies = QUIZ_MOCK_DATA.find((quizz) => quizz.id == id);
+      const quizzies = QUIZ_MOCK_DATA.find((quizz: Quizz) => quizz.id == id);
       // quizz.question = ["1","2"]
-      const questions = QUESTION_MOCK_DATA.filter((q) => {
-        quizzies?.questions.find((item) => item === q.id);
-      });
-      const answers = ANSWER_MOCK_DATA.filter((a) =>
-        questions.some((e) => e.id === a.question_id)
-      );
+      const questions = QUESTION_MOCK_DATA.map(
+        (question: QuestionResponse) => ({
+          ...question,
+          answers: ANSWER_MOCK_DATA.filter(
+            (a) => question.id === a.question_id
+          ),
+        })
+      ).filter((e) => quizzies?.questions.includes(e.id));
+      console.log(questions);
 
-      res.status(200).json(quizz);
+      const result = { ...quizzies, questions: questions };
+      res.status(200).json(result);
 
     case "PUT":
       const { title, description, category } = req.body;

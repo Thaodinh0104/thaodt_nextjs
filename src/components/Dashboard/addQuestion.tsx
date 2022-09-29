@@ -14,6 +14,7 @@ export interface AddQuestionDialogProps {
   open: boolean;
   idAdd: string;
   onClose: (value: string) => void;
+  dataSubmit: any;
 }
 
 function AnswerItem({
@@ -22,7 +23,7 @@ function AnswerItem({
   handleDeleteItem,
   handleCorrectAnswer,
 }: {
-  item: ItemQuestion;
+  item: Answer;
   handleChangeText: any;
   handleDeleteItem: any;
   handleCorrectAnswer: any;
@@ -42,7 +43,7 @@ function AnswerItem({
         <Box display={"flex"} justifyContent={"space-between"}>
           <IconButton
             aria-label="delete"
-            onClick={() => handleDeleteItem(item.key)}
+            onClick={() => handleDeleteItem(item.id)}
             sx={{
               color: "#ffffff",
               borderRadius: "5px",
@@ -56,7 +57,7 @@ function AnswerItem({
           </IconButton>
           <IconButton
             aria-label="corrected"
-            onClick={() => handleCorrectAnswer(item.key)}
+            onClick={() => handleCorrectAnswer(item.id)}
             sx={{
               color: "#ffffff",
               borderRadius: "5px",
@@ -75,8 +76,8 @@ function AnswerItem({
           fullWidth
           id="name"
           name="name"
-          value={item.content}
-          onChange={(e) => handleChangeText(item.key, e.target.value)}
+          value={item.title}
+          onChange={(e) => handleChangeText(item.id, e.target.value)}
           placeholder="Type an answer option here..."
           sx={{
             "& input": {
@@ -98,9 +99,11 @@ function AnswerItem({
   );
 }
 
-interface ItemQuestion {
-  key: string;
-  content: string;
+interface Answer {
+  title: string;
+  id: string;
+  question_id?: string;
+  description?: string;
 }
 
 function makeid(length: number) {
@@ -115,89 +118,107 @@ function makeid(length: number) {
 }
 
 export function AddQuestionDialog(props: AddQuestionDialogProps) {
-  const { onClose, idAdd, open } = props;
-  const [question, setQuestion] = useState("");
+  const { onClose, idAdd, open, dataSubmit } = props;
+  const [questionTitle, setQuestionTitle] = useState("");
   const [correctAnswer, setCorrectAnswer] = useState("");
-  const [answerList, setAnswerList] = useState<ItemQuestion[]>([
+  const [answerList, setAnswerList] = useState<Answer[]>([
     {
-      key: makeid(6),
-      content: "",
+      id: makeid(6),
+      title: "",
     },
     {
-      key: makeid(6),
-      content: "",
+      id: makeid(6),
+      title: "",
     },
     {
-      key: makeid(6),
-      content: "",
+      id: makeid(6),
+      title: "",
     },
     {
-      key: makeid(6),
-      content: "",
+      id: makeid(6),
+      title: "",
     },
   ]);
 
   const handleClose = () => {
     onClose(idAdd);
-    setQuestion("");
+    setQuestionTitle("");
     setCorrectAnswer("");
     setAnswerList([
       {
-        key: makeid(6),
-        content: "",
+        id: makeid(6),
+        title: "",
       },
       {
-        key: makeid(6),
-        content: "",
+        id: makeid(6),
+        title: "",
       },
       {
-        key: makeid(6),
-        content: "",
+        id: makeid(6),
+        title: "",
       },
       {
-        key: makeid(6),
-        content: "",
+        id: makeid(6),
+        title: "",
       },
     ]);
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = {
-      ID: "",
-      name: question,
-      answer: answerList,
-      correct: correctAnswer,
+    const newData = {
+      id: makeid(6),
+      title: questionTitle,
+      answers: answerList,
+      correct_answer: correctAnswer,
     };
+    dataSubmit(newData);
+    onClose(newData.id);
+    setQuestionTitle("");
+    setCorrectAnswer("");
+    setAnswerList([
+      {
+        id: makeid(6),
+        title: "",
+      },
+      {
+        id: makeid(6),
+        title: "",
+      },
+      {
+        id: makeid(6),
+        title: "",
+      },
+      {
+        id: makeid(6),
+        title: "",
+      },
+    ]);
   };
+  // Handle Add more Answer
   const handleAddMoreAnswer = () => {
-    const data: ItemQuestion = {
-      key: makeid(6),
-      content: "",
+    if (answerList.length >= 4) return false;
+    const data: Answer = {
+      id: makeid(6),
+      title: "",
     };
-
     setAnswerList((prevData) => [...prevData, data]);
   };
-
-  const handleChangeText = (key: string, val: string) => {
-    const questionItem: ItemQuestion = {
-      key,
-      content: val,
-    };
-
-    const newData = answerList.map((item) => {
-      if (item.key == questionItem.key) {
-        item = questionItem;
+  // Handle Change text
+  const handleChangeText = (id: string, val: string) => {
+    const newData = answerList?.map((item) => {
+      if (item.id == id) {
+        item = { ...item, title: val };
       }
-
       return item;
     });
-
     setAnswerList(newData);
   };
 
   const handleDeleteItem = (key: string) => {
-    const newData = answerList.filter((item) => item.key !== key);
+    console.log(key);
+    console.log(answerList);
+    const newData = answerList.filter((item) => item.id !== key);
     setAnswerList(newData);
   };
   const handleCorrectAnswer = (key: string) => {
@@ -232,8 +253,8 @@ export function AddQuestionDialog(props: AddQuestionDialogProps) {
             fullWidth
             id="name"
             name="name"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
+            value={questionTitle}
+            onChange={(e) => setQuestionTitle(e.target.value)}
             placeholder="Type your question here"
             sx={{
               "& input": {

@@ -50,33 +50,7 @@ export function EditQuizInfo({
     }
     fetchCategory();
   }, [category]);
-  // Update Quizz Infor
-  // useEffect(() => {
-  //   async function update(datas) {
-  //     const response = await fetch(
-  //       `http://localhost:3000/api/quizzes/${datas.id}`,
-  //       {
-  //         method: "POST",
-  //         body: JSON.stringify({
-  //           result: [
-  //             {
-  //               title: datas.title,
-  //               description: datas.description,
-  //               category: datas.category,
-  //             },
-  //           ],
-  //         }),
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-  //     const data = await response.json();
 
-  //     console.log(data);
-  //   }
-  //   update(dataUpdate);
-  // }, [dataUpdate]);
   //handle Close
   const handleClose = () => {
     onClose(idValue);

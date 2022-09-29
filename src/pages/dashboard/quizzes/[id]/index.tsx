@@ -26,20 +26,21 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirm } from "material-ui-confirm";
 import { useEffect, useState } from "react";
 
-type DataDelete = {
+interface DataDelete {
   id: string;
   title: string;
-};
-type Answer = {
+}
+interface Answer {
   title: string;
   id: string;
   question_id: string;
-};
+  description: string;
+}
 interface Question {
   title: string;
   correct_answer: string;
   id: string;
-  anwser: Answer;
+  answers: Answer;
 }
 interface Quizz {
   category: string;
@@ -59,19 +60,6 @@ function QuestionItem({
   handleEditQuestionOpen: any;
 }) {
   const [dataAnswers, setDataAnswers] = useState<Answer[]>([]);
-  /**
-   * Get list answer by question id
-   */
-  useEffect(() => {
-    async function fetchAnswers() {
-      const response = await fetch("http://localhost:3000/api/answers");
-      const answers = await response.json();
-
-      const newAnswer = answers.filter((e: Answer) => e.question_id == data.id);
-      setDataAnswers(newAnswer);
-    }
-    fetchAnswers();
-  }, []);
   return (
     <Box
       key={data.id}
@@ -97,7 +85,7 @@ function QuestionItem({
         </Stack>
         <Stack direction="row" alignItems={"center"}>
           <Button
-            onClick={() => handleEditQuestionOpen(data.id)}
+            onClick={() => handleEditQuestionOpen(data)}
             sx={{
               bgcolor: "#dfd5d5",
               marginX: "10px",
@@ -190,7 +178,7 @@ function QuestionItem({
             mt={"20px"}
             mx={-1}
           >
-            {dataAnswers.map((awsItem) => {
+            {data.answers?.map((awsItem: Answer) => {
               return (
                 <Box width={"50%"} key={awsItem.id}>
                   <Box
@@ -220,70 +208,54 @@ const Quizzes: NextPage = ({ quizz }) => {
   const [openEditInfo, setOpenEditInfo] = React.useState(false);
   const [openAddQuestion, setOpenAddQuestion] = React.useState(false);
   const [openEditQuestion, setOpenEditQuestion] = React.useState(false);
-  const [questionID, setQuestionID] = React.useState("");
+  const [editQuestionData, setEditQuestionData] = React.useState("");
   const [quizData, setQuizData] = React.useState(quizz);
-  const [dataQuestions, setDataQuestions] = useState<Question[]>([]);
-
-  //   quizData.questions.map((item) => {
-  //     console.log(item.title);
-  //   });
-
-  // Fetch Data
-  useEffect(() => {
-    async function fetchQuestions() {
-      const response = await fetch("http://localhost:3000/api/questions");
-      const questions = await response.json();
-      const newQuestions = questions.filter((item: Question) =>
-        quizz.questions.includes(item.id)
-      );
-      setDataQuestions(newQuestions);
-    }
-    fetchQuestions();
-  }, [quizz]);
-
-  // /**
-  //  * Get list answer by question id
-  //  */
-  // useEffect(() => {
-  //   async function fetchAnswers() {
-  //     const response = await fetch("http://localhost:3000/api/answers");
-  //     const answers = await response.json();
-
-  //     if (dataQuestions.length > 0) {
-  //       const newAnswer = answers.filter(
-  //         (item: Answer) =>
-  //           item.question_id == dataQuestions[currentQuestion].id
-  //       );
-  //       setDataAnswers(newAnswer);
-  //     }
-  //   }
-  //   fetchAnswers();
-  // }, [dataQuestions]);
-
+  const [dataQuestions, setDataQuestions] = useState<Question[]>(
+    quizz.questions
+  );
   const handleEditInfoOpen = () => {
     setOpenEditInfo(true);
   };
-  const handleEditQuestionOpen = (id: string) => {
+  const handleEditQuestionOpen = (data) => {
     setOpenEditQuestion(true);
-    setQuestionID(id);
+    setEditQuestionData(data);
   };
-  const handleCloseEditInfo = (value: string) => {
+  const handleCloseEditInfo = (data) => {
     setOpenEditInfo(false);
   };
-  const handleCloseEditQuestion = (id: string) => {
+  const handleCloseEditQuestion = (data) => {
     setOpenEditQuestion(false);
-    setQuestionID("");
+    setEditQuestionData("");
   };
-  const handleCloseAddQuestion = (id: string) => {
+  const handleCloseAddQuestion = (data) => {
     setOpenAddQuestion(false);
-    setQuestionID("");
+    setEditQuestionData("");
   };
+  const dataSubmitAdd = (data) => {
+    const newData = dataQuestions;
+    newData.push(data);
+    setDataQuestions(newData);
+  };
+  const dataSubmitEdit = (data) => {
+    const newData = dataQuestions.map((item) => {
+      if (item.id == data.id) {
+        item = {
+          ...item,
+          title: data.title,
+          answers: data.answers,
+          correct_answer: data.correct_answer,
+        };
+      }
 
+      return item;
+    });
+    setDataQuestions(newData);
+  };
   const handleDeleteQuestion = (item: DataDelete) => {
     confirm({ description: `Are you sure to delete question ${item.title}.` })
       .then(() => {
-        const newData = quizData.questions.filter((e) => item.id !== e.id);
-        setQuizData({ ...quizData, questions: newData });
+        const newData = dataQuestions.filter((e) => item.id !== e.id);
+        setDataQuestions(newData);
       })
       .catch(() => {
         console.log("Deletion cancelled.");
@@ -425,6 +397,7 @@ const Quizzes: NextPage = ({ quizz }) => {
         idAdd={quizData.id}
         open={openAddQuestion}
         onClose={handleCloseAddQuestion}
+        dataSubmit={dataSubmitAdd}
       />
 
       <Container sx={{ mt: "30px" }}>
@@ -450,10 +423,10 @@ const Quizzes: NextPage = ({ quizz }) => {
         </Box>
       </Container>
       <EditQuestionDialog
-        idQuestion={questionID}
-        idQuizz={quizData.id}
+        data={editQuestionData}
         open={openEditQuestion}
         onClose={handleCloseEditQuestion}
+        dataSubmit={dataSubmitEdit}
       />
     </Dashboard>
   );
