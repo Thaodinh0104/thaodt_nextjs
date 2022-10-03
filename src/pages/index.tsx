@@ -1,14 +1,26 @@
 import FrontLayout from "@components/Front/FrontLayout";
 import type { NextPage } from "next";
 import NextLink from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Typography from "@mui/material/Typography";
 import CardMedia from "@mui/material/CardMedia";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCategories, selectAllCategory } from "redux/category";
+import { store } from "redux/store";
+import { RootState } from "redux/store";
+import categories from "./api/categories";
+
 const Home: NextPage = () => {
+  const posts = useSelector(selectAllCategory);
+  console.log(posts);
+  const categoriesStatus = useSelector((state) => state.categories.status);
+  useEffect(() => {
+    store.dispatch(fetchCategories());
+  }, [categoriesStatus, store.dispatch]);
   return (
     <FrontLayout>
       <Box sx={{ position: "relative" }}>

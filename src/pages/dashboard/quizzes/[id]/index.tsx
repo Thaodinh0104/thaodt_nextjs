@@ -25,6 +25,7 @@ import { EditQuestionDialog } from "@components/Dashboard/editQuestion";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useConfirm } from "material-ui-confirm";
 import { useEffect, useState } from "react";
+import { server } from "config";
 
 interface DataDelete {
   id: string;
@@ -435,7 +436,7 @@ const Quizzes: NextPage = ({ quizz }) => {
 export default Quizzes;
 
 export async function getStaticPaths() {
-  const res = await fetch("http://localhost:3000/api/quizzes");
+  const res = await fetch(`${server}/api/quizzes`);
   const quizz = await res.json();
   const paths = quizz.map((item: Quizz) => ({
     params: { id: item.id },
@@ -450,7 +451,7 @@ export async function getStaticPaths() {
 // `getStaticPaths` requires using `getStaticProps`
 export async function getStaticProps(context: any) {
   const { params } = context;
-  const res = await fetch(`http://localhost:3000/api/quizzes/${params.id}`);
+  const res = await fetch(`${server}/api/quizzes/${params.id}`);
   const quizz = await res.json();
   return {
     // Passed to the page component as props

@@ -12,6 +12,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
 import { useRouter } from "next/router";
+import { server } from "config";
 export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
@@ -27,7 +28,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
   // Get Category
   useEffect(() => {
     async function fetchCategory() {
-      const response = await fetch("http://localhost:3000/api/categories");
+      const response = await fetch(`${server}/api/categories`);
       const category = await response.json();
       setCategories(category);
     }
@@ -48,7 +49,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
     const category = data.get("category");
 
     async function addQuizz(title: String, description: String, catID: String) {
-      const response = await fetch("http://localhost:3000/api/quizzes", {
+      const response = await fetch("/api/quizzes", {
         method: "POST",
         body: JSON.stringify({
           title: title,

@@ -11,6 +11,7 @@ import DialogActions from "@mui/material/DialogActions";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
+import { server } from "config";
 // export interface SimpleDialogProps {
 //   open: boolean;
 //   idValue: string;
@@ -44,7 +45,7 @@ export function EditQuizInfo({
   // Get Category
   useEffect(() => {
     async function fetchCategory() {
-      const response = await fetch("http://localhost:3000/api/categories");
+      const response = await fetch(`${server}/api/categories`);
       const category = await response.json();
       setCategories(category);
     }
@@ -71,20 +72,17 @@ export function EditQuizInfo({
       user: data.user,
     };
     async function update(datas) {
-      const response = await fetch(
-        `http://localhost:3000/api/quizzes/${datas.id}`,
-        {
-          method: "PUT",
-          body: JSON.stringify({
-            title: datas.title,
-            description: datas.description,
-            category: datas.category,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await fetch(`/api/quizzes/${datas.id}`, {
+        method: "PUT",
+        body: JSON.stringify({
+          title: datas.title,
+          description: datas.description,
+          category: datas.category,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
       const data = await response.json();
 
       console.log(data);

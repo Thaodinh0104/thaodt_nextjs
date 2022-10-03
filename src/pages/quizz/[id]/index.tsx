@@ -23,6 +23,7 @@ import { positions } from "@mui/system";
 import { title } from "process";
 import clsx from "clsx";
 import useAppContext from "context/AppContext";
+import { server } from "config";
 type Answer = {
   title: string;
   id: string;
@@ -105,7 +106,7 @@ const Quizz: NextPage = ({ quizz }) => {
 
   useEffect(() => {
     async function fetchQuestions() {
-      const response = await fetch("http://localhost:3000/api/questions");
+      const response = await fetch(`${server}/api/questions`);
       const questions = await response.json();
       const newQuestions = questions.filter((item: Question) =>
         quizz.questions.includes(item.id)
@@ -120,7 +121,7 @@ const Quizz: NextPage = ({ quizz }) => {
    */
   useEffect(() => {
     async function fetchAnswers() {
-      const response = await fetch("http://localhost:3000/api/answers");
+      const response = await fetch(`${server}/api/answers`);
       const answers = await response.json();
 
       if (dataQuestions.length > 0) {
@@ -217,7 +218,7 @@ const Quizz: NextPage = ({ quizz }) => {
     setScore(scoreValue);
 
     async function AddResult(score: Number, quizzID: String) {
-      const response = await fetch("http://localhost:3000/api/user/1", {
+      const response = await fetch(`${server}/api/user/1`, {
         method: "POST",
         body: JSON.stringify({
           result: [{ quizz_id: quizzID, result: score }],
@@ -395,7 +396,7 @@ const Quizz: NextPage = ({ quizz }) => {
 
 export default Quizz;
 export async function getStaticPaths() {
-  const res = await fetch("http://localhost:3000/api/quizzes");
+  const res = await fetch(`${server}/api/quizzes`);
   const quizz = await res.json();
   const paths = quizz.map((item: Quizz) => ({
     params: { id: item.id },
@@ -410,7 +411,7 @@ export async function getStaticPaths() {
 // `getStaticPaths` requires using `getStaticProps`
 export async function getStaticProps(context: any) {
   const { params } = context;
-  const res = await fetch(`http://localhost:3000/api/quizzes/${params.id}`);
+  const res = await fetch(`${server}/api/quizzes/${params.id}`);
   const quizz = await res.json();
   return {
     // Passed to the page component as props
