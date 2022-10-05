@@ -13,6 +13,9 @@ import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
 import { useRouter } from "next/router";
 import { server } from "config";
+import { useSelector } from "react-redux";
+import { fetchCategories, selectAllCategory } from "redux/category";
+import { store } from "redux/store";
 export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
@@ -22,18 +25,15 @@ interface Category {}
 export function SimpleDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
   const [age, setAge] = useState("");
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [quizz, setQuizz] = useState("");
   const router = useRouter();
   // Get Category
+  const categories = useSelector(selectAllCategory);
+  const categoriesStatus = useSelector((state) => state.categories.status);
   useEffect(() => {
-    async function fetchCategory() {
-      const response = await fetch(`${server}/api/categories`);
-      const category = await response.json();
-      setCategories(category);
-    }
-    fetchCategory();
-  }, []);
+    store.dispatch(fetchCategories());
+  }, [categoriesStatus, store.dispatch]);
 
   // Close popup create quizz
   const handleClose = () => {

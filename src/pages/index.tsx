@@ -15,12 +15,6 @@ import { RootState } from "redux/store";
 import categories from "./api/categories";
 
 const Home: NextPage = () => {
-  const posts = useSelector(selectAllCategory);
-  console.log(posts);
-  const categoriesStatus = useSelector((state) => state.categories.status);
-  useEffect(() => {
-    store.dispatch(fetchCategories());
-  }, [categoriesStatus, store.dispatch]);
   return (
     <FrontLayout>
       <Box sx={{ position: "relative" }}>

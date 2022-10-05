@@ -12,6 +12,9 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FileUpload from "react-material-file-upload";
 import { server } from "config";
+import { useSelector } from "react-redux";
+import { fetchCategories, selectAllCategory } from "redux/category";
+import { store } from "redux/store";
 // export interface SimpleDialogProps {
 //   open: boolean;
 //   idValue: string;
@@ -37,20 +40,17 @@ export function EditQuizInfo({
   onClose: any;
   data: Quizz;
 }) {
-  const [categories, setCategories] = useState([]);
+  // const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState(data.category);
   const [description, setDescription] = useState(data.description);
   // const [dataUpdate, setDataUpdate] = useState<Quizz>();
   const [title, setTitle] = useState(data.title);
   // Get Category
+  const categories = useSelector(selectAllCategory);
+  const categoriesStatus = useSelector((state) => state.categories.status);
   useEffect(() => {
-    async function fetchCategory() {
-      const response = await fetch(`${server}/api/categories`);
-      const category = await response.json();
-      setCategories(category);
-    }
-    fetchCategory();
-  }, [category]);
+    store.dispatch(fetchCategories());
+  }, [categoriesStatus, store.dispatch]);
 
   //handle Close
   const handleClose = () => {
