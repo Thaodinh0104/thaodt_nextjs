@@ -1,6 +1,7 @@
 import Avatar from "@mui/material/Avatar";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
+
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -16,6 +17,7 @@ import { server } from "config";
 import { useSelector } from "react-redux";
 import { fetchCategories, selectAllCategory } from "redux/category";
 import { store } from "redux/store";
+import { createQuizz, selectQuizzList } from "redux/quizz";
 export interface SimpleDialogProps {
   open: boolean;
   selectedValue: string;
@@ -31,10 +33,15 @@ export function SimpleDialog(props: SimpleDialogProps) {
   // Get Category
   const categories = useSelector(selectAllCategory);
   const categoriesStatus = useSelector((state) => state.categories.status);
+  console.log(useSelector((state) => state));
+  // const quizzStatus = useSelector((state) => state.quizzes?.message);
+
   useEffect(() => {
     store.dispatch(fetchCategories());
   }, [categoriesStatus, store.dispatch]);
-
+  // useEffect(() => {
+  //   store.dispatch(selectQuizzList());
+  // }, [quizzStatus, store.dispatch]);
   // Close popup create quizz
   const handleClose = () => {
     onClose(selectedValue);
@@ -49,24 +56,17 @@ export function SimpleDialog(props: SimpleDialogProps) {
     const category = data.get("category");
 
     async function addQuizz(title: String, description: String, catID: String) {
-      const response = await fetch("/api/quizzes", {
-        method: "POST",
-        body: JSON.stringify({
-          title: title,
-          description: description,
-          category: catID,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await response.json();
+      const updatedQuizzData = {
+        title: title,
+        description: description,
+        category: catID,
+      };
+      store.dispatch(createQuizz({ updatedQuizzData }));
 
-      setQuizz(data.id);
-      console.log(data);
+      // setQuizz(data.id);
     }
     addQuizz(title, description, category);
-    router.push(`/dashboard/quizzes/${quizz}`);
+    // router.push(`/dashboard/quizzes/${quizz}`);
   };
 
   const handleChange = (event: SelectChangeEvent) => {

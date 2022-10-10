@@ -8,11 +8,6 @@ import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchCategories, selectAllCategory } from "redux/category";
-import { store } from "redux/store";
-import { RootState } from "redux/store";
-import categories from "./api/categories";
 
 const Home: NextPage = () => {
   return (

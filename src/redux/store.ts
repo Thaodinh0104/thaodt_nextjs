@@ -1,10 +1,12 @@
 import { Action, configureStore, ThunkAction } from "@reduxjs/toolkit";
 import CategoriesSlice from "./category";
+import { QuizzSlice } from "./quizz";
 // ...
 
 export const store = configureStore({
   reducer: {
     categories: CategoriesSlice,
+    quizzes: QuizzSlice,
   },
 });
 
