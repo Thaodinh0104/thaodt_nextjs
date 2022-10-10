@@ -33,7 +33,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
   // Get Category
   const categories = useSelector(selectAllCategory);
   const categoriesStatus = useSelector((state) => state.categories.status);
-  console.log(useSelector((state) => state));
+  // console.log(useSelector((state) => state));
   // const quizzStatus = useSelector((state) => state.quizzes?.message);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ export function SimpleDialog(props: SimpleDialogProps) {
         description: description,
         category: catID,
       };
-      store.dispatch(createQuizz({ updatedQuizzData }));
+      store.dispatch(createQuizz({ updatedQuizzData, router }));
 
       // setQuizz(data.id);
     }

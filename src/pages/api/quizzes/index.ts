@@ -1,6 +1,11 @@
 import { QUIZ_MOCK_DATA } from "./quizzes";
+import React, { useEffect } from "react";
 
 export default function handler(req, res) {
+  // window.localStorage.setItem("quizzData", json(QUIZ_MOCK_DATA));
+  // useEffect(() => {
+  //   window.localStorage.setItem("quizzData", JSON.stringify(QUIZ_MOCK_DATA));
+  // }, []);
   if (req.method === "GET") {
     res.status(200).json(QUIZ_MOCK_DATA);
   } else if (req.method === "POST") {
@@ -18,6 +23,10 @@ export default function handler(req, res) {
       questions,
     };
     QUIZ_MOCK_DATA.push(newQuizz);
-    res.status(201).json(newQuizz);
+    const data = {
+      currentID: newQuizz.id,
+      listQuizz: QUIZ_MOCK_DATA,
+    };
+    res.status(201).json(data);
   }
 }

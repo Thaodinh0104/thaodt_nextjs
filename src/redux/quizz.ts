@@ -1,12 +1,17 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { Action, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { server } from "config";
+
+const data = async () => {
+  const response = await await fetch(`${server}/api/quizzes`);
+  const quizz = await response.json();
+  return quizz;
+};
 
 const initialState = {
   quizzes: [],
   error: "",
   loading: false,
 };
-
 export const getQuizzies = createAsyncThunk(
   "getQuizzies",
   async ({ rejectWithValue }) => {
@@ -25,6 +30,7 @@ export const getQuizzByID = createAsyncThunk(
     try {
       const response = await fetch(`${server}/api/quizzes/${id}`);
       const quizz = await res.json();
+
       return quizz;
     } catch (err) {
       return rejectWithValue(err.response.data);
@@ -33,7 +39,7 @@ export const getQuizzByID = createAsyncThunk(
 );
 export const createQuizz = createAsyncThunk(
   "quizz/createQuizz",
-  async ({ updatedQuizzData }, { rejectWithValue }) => {
+  async ({ updatedQuizzData, router }, { rejectWithValue }) => {
     try {
       const response = await fetch("/api/quizzes", {
         method: "POST",
@@ -48,8 +54,8 @@ export const createQuizz = createAsyncThunk(
       });
       const data = await response.json();
       console.log(data);
-
-      return data;
+      router.push(`/dashboard/quizzes/${data.currentID}`);
+      return data.listQuizz;
     } catch (err) {
       return rejectWithValue(err.response.data);
     }
@@ -107,50 +113,27 @@ export const QuizzSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: {
-    [getQuizzies.pending]: (state, action) => {
-      state.loading = true;
-    },
-    [getQuizzies.fulfilled]: (state, action) => {
-      state.loading = false;
-      state.quizzes = [action.payload];
-    },
-    [getQuizzies.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.payload.message;
-    },
-    [getQuizzByID.pending]: (state, action) => {
-      state.loading = true;
-    },
-    [getQuizzByID.fulfilled]: (state, action) => {
-      state.loading = false;
-      state.quizzes = [action.payload];
-    },
-    [getQuizzies.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.payload.message;
-    },
     [createQuizz.pending]: (state, action) => {
       state.loading = true;
     },
     [createQuizz.fulfilled.type]: (state, action) => {
       state.loading = false;
-      state.quizzes = [action.payload.title];
-      console.log(state);
+      state.quizzes = action.payload;
     },
     [createQuizz.rejected]: (state, action) => {
       state.loading = false;
       state.error = action.payload.message;
     },
-    [updateQuizz.pending]: (state, action) => {
-      state.loading = true;
-    },
-    [updateQuizz.fulfilled]: (state, action) => {
-      state.loading = false;
-    },
-    [updateQuizz.rejected]: (state, action) => {
-      state.loading = false;
-      state.error = action.payload.message;
-    },
+    // [updateQuizz.pending]: (state, action) => {
+    //   state.loading = true;
+    // },
+    // [updateQuizz.fulfilled]: (state, action) => {
+    //   state.loading = false;
+    // },
+    // [updateQuizz.rejected]: (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload.message;
+    // },
   },
 });
 
