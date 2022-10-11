@@ -6,9 +6,10 @@ const data = async () => {
   const quizz = await response.json();
   return quizz;
 };
+console.log(data);
 
 const initialState = {
-  quizzes: [],
+  quizzes: data,
   error: "",
   loading: false,
 };
